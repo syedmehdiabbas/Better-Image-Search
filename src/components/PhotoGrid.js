@@ -1,19 +1,28 @@
 import React from "react";
-import { Grid } from "@chakra-ui/react";
-import PhotoGridItem from "./PhotoGridItem";
+import { Image, HStack, Link, Spinner } from "@chakra-ui/react";
+import { Link as RouterLink } from "react-router-dom";
 
-function PhotoGrid() {
+function PhotoGrid({ photos }) {
+  if (!photos) return <Spinner />;
   return (
-    <Grid
-      templateColumns={["repeat(1,1fr)", "repeat(2,1fr)", "repeat(4,1fr)"]}
-      templateRows={["repeat(9,1fr)", "repeat(5,1fr)", "repeat(3,1fr)"]}>
-      <PhotoGridItem cs={2} rs={2} id={12} size={700} />
-      {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
-        let id = Math.floor(Math.random() * 100);
-        console.log(id);
-        return <PhotoGridItem key={i} id={id} />;
-      })}
-    </Grid>
+    <HStack flexWrap="wrap" spacing="0" justifyContent="center">
+      {photos.map((p) => (
+        <Link as={RouterLink} to={`/photo/${p.id}`} key={p.id}>
+          <Image
+            onMouseEnter={(e) => {
+              e.target.style.transform = "scale(1.02)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = "scale(1)";
+            }}
+            boxSize="300px"
+            boxShadow="inner"
+            objectFit="cover"
+            alt={p.description}
+            src={p.urls.small}></Image>
+        </Link>
+      ))}
+    </HStack>
   );
 }
 

@@ -1,52 +1,80 @@
 import {
   ChakraProvider,
-  VStack,
   Text,
-  ButtonGroup,
-  Center,
   Container,
+  VStack,
+  Image,
+  Link,
 } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link as RouterLink,
+} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Search from "./components/Search";
 import PhotoGrid from "./components/PhotoGrid";
 import Footer from "./components/Footer";
-import CategoryButton from "./components/CategoryButton";
-import WebSeries from "./components/WebSeries";
-import PhotoGrid2 from "./components/PhotoGrid2";
+import { createApi } from "unsplash-js";
+import PhotoPage from "./components/PhotoPage";
+
+const unsplashAPI = createApi({ accessKey: process.env.REACT_APP_ACCESS_KEY });
 
 function App() {
+  const [gridPhotos, setGridPhotos] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
+
+  function handleSearch() {
+    unsplashAPI.search
+      .getPhotos({
+        query: searchInput,
+        perPage: 12,
+      })
+      .then((res) => {
+        setGridPhotos(res.response.results);
+        window.scrollBy({
+          left: 0,
+          top: window.innerHeight,
+          behavior: "smooth",
+        });
+      })
+      .catch((e) => console.error(e));
+  }
+
+  useEffect(() => {
+    unsplashAPI.photos
+      .list({ orderBy: "popular", perPage: 12 })
+      .then((res) => {
+        setGridPhotos(res.response.results);
+      })
+      .catch((e) => console.error(e));
+  }, []);
+
   return (
     <ChakraProvider>
-      <Container maxW="1200px">
-        <Navbar></Navbar>
-        <VStack bg="blue.100" py={20} spacing={10}>
-          <Text fontSize="4xl">Move the world</Text>
-          <Search></Search>
-        </VStack>
-        <Center>
-          <ButtonGroup
-            flexDirection={["column", "column", "row"]}
-            variant="ghost"
-            py={[0, 0, 5]}
-            spacing={12}>
-            {[
-              "",
-              "CREATIVE",
-              "EDITORIAL",
-              "VIDEO",
-              "MUSIC",
-              "BLOG",
-              "COLLECTIONS",
-              " ",
-            ].map((c) => (
-              <CategoryButton key={c} category={c} />
-            ))}
-          </ButtonGroup>
-        </Center>
-        <PhotoGrid />
-        <WebSeries />
-        <PhotoGrid2 />
-        <Footer />
+      <Container maxW="full" bg="gray.100">
+        <Router>
+          <Navbar></Navbar>
+          <Switch>
+            <Route exact path="/">
+              <VStack spacing={2} py={16}>
+                <Text fontSize="3xl">Get high quality photos</Text>
+                <Text fontSize="3xl">No signup required</Text>
+                <Search
+                  searchInput={searchInput}
+                  setSearchInput={setSearchInput}
+                  handleSearch={handleSearch}></Search>
+              </VStack>
+              <PhotoGrid photos={gridPhotos} />
+            </Route>
+            <Route path="/photo/:id">
+              <PhotoPage unsplashAPI={unsplashAPI} />
+            </Route>
+          </Switch>
+          <Footer />
+        </Router>
       </Container>
     </ChakraProvider>
   );

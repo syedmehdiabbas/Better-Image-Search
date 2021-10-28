@@ -22,7 +22,7 @@ function Navbar() {
           <polyline points="9 22 9 12 15 12 15 22"></polyline>
         </svg>
       </Link>
-      <Heading>freeImages</Heading>
+      <Heading>Better Image Search</Heading>
       <MoonIcon />
     </HStack>
   );

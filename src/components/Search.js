@@ -10,13 +10,12 @@ function Search({ handleSearch, searchInput, setSearchInput }) {
         handleSearch();
       }}>
       <Stack
-        my={8}
+        my={16}
         px={5}
         direction="row"
         py={2}
-        boxShadow="2xl"
+        boxShadow="dark-lg"
         borderRadius="md"
-        bg="white"
         spacing={5}>
         <Input
           value={searchInput}

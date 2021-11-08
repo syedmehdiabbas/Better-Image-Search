@@ -1,10 +1,10 @@
 import {
   ChakraProvider,
+  Heading,
   Text,
   Container,
   VStack,
-  Image,
-  Link,
+  Button,
 } from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
 import {
@@ -19,12 +19,16 @@ import PhotoGrid from "./components/PhotoGrid";
 import Footer from "./components/Footer";
 import { createApi } from "unsplash-js";
 import PhotoPage from "./components/PhotoPage";
+import theme from "./theme";
 
-const unsplashAPI = createApi({ accessKey: process.env.REACT_APP_ACCESS_KEY });
+const unsplashAPI = createApi({
+  accessKey: process.env.REACT_APP_ACCESS_KEY,
+});
 
 function App() {
   const [gridPhotos, setGridPhotos] = useState([]);
   const [searchInput, setSearchInput] = useState("");
+  const [page, setPage] = useState(1);
 
   function handleSearch() {
     unsplashAPI.search
@@ -43,31 +47,40 @@ function App() {
       .catch((e) => console.error(e));
   }
 
-  useEffect(() => {
+  function homeLoad() {
     unsplashAPI.photos
       .list({ orderBy: "popular", perPage: 12 })
       .then((res) => {
         setGridPhotos(res.response.results);
       })
       .catch((e) => console.error(e));
+  }
+
+  useEffect(() => {
+    homeLoad();
   }, []);
 
   return (
-    <ChakraProvider>
-      <Container maxW="full" bg="gray.100">
+    <ChakraProvider theme={theme}>
+      <Container maxW="full" textAlign="center">
         <Router>
-          <Navbar></Navbar>
+          <Navbar homeLoad={homeLoad}></Navbar>
+          <Heading color="teal.400" my={4}>
+            Better Image Search
+          </Heading>
           <Switch>
             <Route exact path="/">
-              <VStack spacing={2} py={16}>
-                <Text fontSize="3xl">Get high quality photos</Text>
-                <Text fontSize="3xl">No signup required</Text>
+              <VStack spacing={2}>
+                <Text fontSize="2xl">
+                  Get high quality stock photos without any hassle
+                </Text>
+
                 <Search
                   searchInput={searchInput}
                   setSearchInput={setSearchInput}
                   handleSearch={handleSearch}></Search>
               </VStack>
-              <PhotoGrid photos={gridPhotos} />
+              <PhotoGrid photos={gridPhotos}></PhotoGrid>
             </Route>
             <Route path="/photo/:id">
               <PhotoPage unsplashAPI={unsplashAPI} />

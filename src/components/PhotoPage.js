@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link as RouterLink, BrowserRouter } from "react-router-dom";
 import {
   Container,
-  Loading,
+  Spinner,
   VStack,
   Link,
   Image,
   Button,
+  Text,
+  HStack,
 } from "@chakra-ui/react";
 
 function PhotoPage({ unsplashAPI }) {
@@ -24,19 +26,27 @@ function PhotoPage({ unsplashAPI }) {
       .catch((err) => console.error(err));
   }, []);
 
-  return (
-    Object.keys(image).length !== 0 && (
-      <Container centerContent maxW="container.lg">
-        <Image boxShadow="inner" src={image.urls.small} my={8}></Image>
+  return Object.keys(image).length !== 0 ? (
+    <Container centerContent maxW="container.lg" minH="90vh">
+      <VStack my={8} spacing={6}>
+        <Image boxShadow="inner" src={image.urls.regular}></Image>
+        <HStack>
+          <Text>Clicked by </Text>
+          <Link href={image.user.portfolio_url}>
+            {image.user.first_name} {image.user.last_name}
+          </Link>
+        </HStack>
         <Button
-          colorScheme="pink"
+          colorScheme="teal"
           onClick={() => {
             window.location.href = image.links.download;
           }}>
           Download
         </Button>
-      </Container>
-    )
+      </VStack>
+    </Container>
+  ) : (
+    <Spinner size="xl"></Spinner>
   );
 }
 
